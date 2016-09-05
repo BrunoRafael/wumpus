@@ -1,9 +1,22 @@
 package components;
 
-public class Hunter extends WumpusComponent{
+import java.util.List;
+
+import scenario.ComponentName;
+
+public class Hunter extends Component{
 	
-	public Hunter(int[] coord, String name){
-		super(coord, name);
+	public Hunter(List<Integer> coord){
+		super(coord);
+	}
+	
+	public Hunter(int x, int y){
+		super(x, y);
+	}
+
+	@Override
+	public char getSymbol() {
+		return ComponentName.HUNTER.getSymbol();
 	}
 
 }
