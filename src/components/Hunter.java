@@ -1,5 +1,6 @@
 package components;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import scenario.ComponentName;
@@ -7,11 +8,7 @@ import scenario.ComponentName;
 public class Hunter extends Component{
 	
 	public Hunter(List<Integer> coord){
-		super(coord);
-	}
-	
-	public Hunter(int x, int y){
-		super(x, y);
+		super(coord, ComponentName.HUNTER);
 	}
 
 	@Override

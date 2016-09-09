@@ -7,7 +7,7 @@ import scenario.ComponentName;
 public class Gold extends Component{
 
 	public Gold(List<Integer> coord) {
-		super(coord);
+		super(coord, ComponentName.GOLD);
 	}
 
 	@Override

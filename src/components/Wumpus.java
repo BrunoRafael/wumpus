@@ -7,7 +7,7 @@ import scenario.ComponentName;
 public class Wumpus extends Danger{
 	
 	public Wumpus(List<Integer> coord) {
-		super(coord);
+		super(coord, ComponentName.WUMPUS);
 	}
 
 	@Override

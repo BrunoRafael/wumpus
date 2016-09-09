@@ -5,17 +5,14 @@ import java.util.List;
 import scenario.ComponentName;
 
 public class Alert extends Component{
-	
-	private ComponentName cName;
 
-	public Alert(List<Integer> coord, ComponentName cName) {
-		super(coord);
-		this.cName = cName;
+	public Alert(List<Integer> coord, ComponentName name) {
+		super(coord, name);
 	}
 
 	@Override
 	public char getSymbol() {
-		return this.cName.getSymbol();
+		return this.getName().getSymbol();
 	}
 
 }

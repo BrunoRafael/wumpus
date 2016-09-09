@@ -7,7 +7,7 @@ import scenario.ComponentName;
 public class Hole extends Danger{
 
 	public Hole(List<Integer> coord) {
-		super(coord);
+		super(coord, ComponentName.HOLE);
 		// TODO Auto-generated constructor stub
 	}
 
