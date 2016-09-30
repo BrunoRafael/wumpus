@@ -88,8 +88,10 @@ public class Scenario {
 	
 	public State moveComponent(ComponentName componentName, Point actualCoord, Point newCoord) 
 			throws Exception{
-		if(!isAvailable(componentName, actualCoord) || !isAvailable(componentName, newCoord)){
-			throw new Exception("Position unavailable");
+		if(componentName != ComponentName.HUNTER){
+			if(!isAvailable(componentName, newCoord)){
+				throw new Exception("Position unavailable");
+			}
 		}
 						
 		Component c = this.board.get(

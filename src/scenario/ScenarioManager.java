@@ -130,6 +130,7 @@ public class ScenarioManager {
 		
 		List<Point> points = new LinkedList<Point>();
 		Point actualPoint = this.sc.getHunterPosition();
+		System.out.println(this.sc.toString());
 		
 		if(hDistance > vDistance){
 			while(hDistance > vDistance){
@@ -139,7 +140,7 @@ public class ScenarioManager {
 				vDistance = Math.abs(actualPoint.getX() - goldPosition.getX());
 			}
 		} else {
-			while(hDistance <= vDistance){
+			while(hDistance < vDistance){
 				actualPoint = selectPoint(actualPoint, goldPosition);
 				points.add(actualPoint);
 				hDistance = Math.abs(actualPoint.getY() - goldPosition.getY());

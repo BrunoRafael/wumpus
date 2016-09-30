@@ -12,8 +12,9 @@ public class Game {
 	}
 	
 	public void execute(){
-		while(!agent.finalized()){
-			agent.nextMove();
+		boolean finalized = agent.nextMove(); 
+		while(!finalized){
+			finalized = agent.nextMove();
 		}
 	}
 	

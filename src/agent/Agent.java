@@ -21,7 +21,7 @@ public class Agent {
 		}
 	}
 	
-	public void nextMove() {
+	public boolean nextMove() {
 		State actualState = State.CONTINUE;
 		System.out.println(sManager.toString());
 		while(actualState == State.CONTINUE){
@@ -43,11 +43,8 @@ public class Agent {
 		} else {
 			System.out.println("Victoryyy :D");
 		}
-	}
-	
-	public boolean finalized() {
-		// TODO Auto-generated method stub
-		return false;
+		
+		return true;
 	}
 	
 	@Override
