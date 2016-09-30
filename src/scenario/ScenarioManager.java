@@ -1,9 +1,7 @@
 package scenario;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import components.Component;
@@ -140,11 +138,17 @@ public class ScenarioManager {
 				vDistance = Math.abs(actualPoint.getX() - goldPosition.getX());
 			}
 		} else {
-			while(hDistance < vDistance){
+			if(hDistance == vDistance){
+				System.out.println("equals");
+			}
+			while(true){
 				actualPoint = selectPoint(actualPoint, goldPosition);
 				points.add(actualPoint);
 				hDistance = Math.abs(actualPoint.getY() - goldPosition.getY());
 				vDistance = Math.abs(actualPoint.getX() - goldPosition.getX());
+				if(hDistance == 0 && vDistance == 0){
+					break;
+				}
 			}
 		}
 		
@@ -158,11 +162,13 @@ public class ScenarioManager {
 	
 	private Point selectPoint(Point actualPoint, Point goldPosition){
 		Point newPoint = new Point(actualPoint.getX(), actualPoint.getY());
-		if(actualPoint.getX() < goldPosition.getX()){
+		if(actualPoint.getX() < goldPosition.getX() && 
+				actualPoint.getX() < this.sc.getWidth()){
 			newPoint.setX(actualPoint.getX() + 1);
 		}
 		
-		if(actualPoint.getY() < goldPosition.getY()){
+		if(actualPoint.getY() < goldPosition.getY() && 
+				actualPoint.getY() < this.sc.getHeight()){
 			newPoint.setY(actualPoint.getY() + 1);
 		}
 		
