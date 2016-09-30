@@ -6,13 +6,13 @@ import scenario.ComponentName;
 
 public class Hole extends Danger{
 
-	public Hole(List<Integer> coord) {
+	public Hole(Point coord) {
 		super(coord, ComponentName.HOLE);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public Alert createAlert(List<Integer> position) {
+	public Alert createAlert(Point position) {
 		// TODO Auto-generated method stub
 		return new Alert(position, ComponentName.BREEZE);
 	}

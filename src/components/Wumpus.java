@@ -6,12 +6,12 @@ import scenario.ComponentName;
 
 public class Wumpus extends Danger{
 	
-	public Wumpus(List<Integer> coord) {
+	public Wumpus(Point coord) {
 		super(coord, ComponentName.WUMPUS);
 	}
 
 	@Override
-	public Alert createAlert(List<Integer> position) {
+	public Alert createAlert(Point position) {
 		return new Alert(position, ComponentName.BED_SMELL);
 	}
 

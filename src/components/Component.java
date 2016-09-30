@@ -1,15 +1,12 @@
 package components;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import scenario.ComponentName;
 
 public abstract class Component {
-	private List<Integer> coordinates;
+	private Point coordinates;
 	private ComponentName name;
 		
-	public Component(List<Integer> coord, ComponentName name){
+	public Component(Point coord, ComponentName name){
 		this.coordinates = coord;
 		this.setName(name);
 	}
@@ -17,23 +14,27 @@ public abstract class Component {
 	public Component(){}
 	
 	public void setX(int x){
-		this.coordinates.set(0, x);
+		this.coordinates.setX(x);
 	}
 	
 	public int getX(){
-		return this.coordinates.get(0);
+		return this.coordinates.getX();
 	}
 	
 	public void setY(int y){
-		this.coordinates.set(1, y);
+		this.coordinates.setY(y);
 	}
 	
 	public int getY(){
-		return this.coordinates.get(1);
+		return this.coordinates.getY();
 	}
 	
-	public List<Integer> getCoordinates(){
+	public Point getCoordinates(){
 		return this.coordinates;
+	}
+	
+	public void setCoordinates(Point coord){
+		this.coordinates = coord;
 	}
 	
 	public abstract char getSymbol();

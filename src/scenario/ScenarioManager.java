@@ -1,5 +1,6 @@
 package scenario;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,21 +11,25 @@ import components.Danger;
 import components.Gold;
 import components.Hole;
 import components.Hunter;
+import components.Point;
 import components.Wumpus;
-import utils.Movimentation;
+import main.State;
 
 public class ScenarioManager {
 	
 	private Scenario sc;
+	private List<Point> movimentsToGold;
 	
-	public void generateScenario(){
+	public ScenarioManager(boolean useFirstDiagonal){
 		this.sc = new Scenario();
+		generateScenario();
+		this.movimentsToGold = getMovimentsToGold(useFirstDiagonal);
+	}
+	
+	private void generateScenario(){
 		try {
 			
-			List<Integer> pos = new LinkedList<Integer>();
-			pos.add(0);
-			pos.add(0);
-			this.sc.addComponent(new Hunter(pos));
+			this.sc.addComponent(new Hunter(new Point(0, 0)));
 			Danger wumpus = new Wumpus(generatePosition(ComponentName.WUMPUS));
 			sc.addComponent(wumpus);
 			addAlertTo(wumpus);
@@ -42,21 +47,19 @@ public class ScenarioManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-					
-		
 	}
-	
-	private List<Integer> generatePosition(ComponentName component){
+		
+	private Point generatePosition(ComponentName component){
 		
 		Random rn = new Random();
 		
-		List<Integer> pos = new LinkedList<Integer>();
-		pos.add(rn.nextInt(sc.getWidth()));
-		pos.add(rn.nextInt(sc.getHeight()));
+		Point pos = new Point();
+		pos.setX(rn.nextInt(sc.getWidth()));
+		pos.setY(rn.nextInt(sc.getHeight()));
 		
 		while(!sc.isAvailable(component, pos)){
-			pos.set(0, rn.nextInt(sc.getWidth()));
-			pos.set(1, rn.nextInt(sc.getHeight()));
+			pos.setX(rn.nextInt(sc.getWidth()));
+			pos.setY(rn.nextInt(sc.getHeight()));
 		};
 		
 		return pos;
@@ -64,31 +67,26 @@ public class ScenarioManager {
 	
 	private void addAlertTo(Danger cTarget){
 		try {
-			List<Integer> pos = new LinkedList<Integer>();
+			Point pos = new Point();
 			if(cTarget.getX() + 1 <= this.sc.getWidth() - 1){
-				pos.add(0, cTarget.getX() + 1);
-				pos.add(1, cTarget.getY());
+				pos.setX(cTarget.getX() + 1);
+				pos.setY(cTarget.getY());
 				this.sc.addComponent(cTarget.createAlert(pos));
 			}
 			
 			if(cTarget.getY() + 1 <= this.sc.getHeight() - 1){
-				pos = new LinkedList<Integer>();
-				pos.add(0, cTarget.getX());
-				pos.add(1, cTarget.getY() + 1);
+				pos = new Point(cTarget.getX(), cTarget.getY() + 1);
 				this.sc.addComponent(cTarget.createAlert(pos));
 			}
 	
 			if(cTarget.getX() - 1 >= 0){
-				pos = new LinkedList<Integer>();
-				pos.add(cTarget.getX() - 1);
-				pos.add(cTarget.getY());
+				pos = new Point(cTarget.getX() - 1, cTarget.getY());
 				this.sc.addComponent(cTarget.createAlert(pos));
 			}
 			
 			if(cTarget.getY() - 1 >= 0){
-				pos = new LinkedList<Integer>();
-				pos.add(0, cTarget.getX());
-				pos.add(1, cTarget.getY() - 1);
+				pos = new Point(cTarget.getX(),  cTarget.getY() - 1);
+
 				this.sc.addComponent(cTarget.createAlert(pos));
 			}
 		} catch (Exception e) {
@@ -97,52 +95,86 @@ public class ScenarioManager {
 		}
 	}
 	
-	public List<Movimentation> getMovimentsToGold(){
-		List<Integer> gPosition = this.sc.getGoldPosition();
-		List<Integer> hPosition = this.sc.getHunterPosition();
+	/**
+	 * @throws Exception 
+	 * 
+	 */
+	public State explore(Point newCoord) throws Exception{
+		return this.sc.moveComponent(ComponentName.HUNTER, 
+				this.sc.getHunterPosition(), newCoord);
+	}
+	
+	public List<Point> getHunterAvailablePositions(){
+		return sc.getAvailablePositionsToNext();
+	}
+	
+	private List<Point> getMovimentsToGold(boolean useFirstDiagonal){
 		
-		int hDistance = Math.abs(gPosition.get(0) - hPosition.get(0));
-		int vDistance = Math.abs(gPosition.get(1) - hPosition.get(1));
+		Point gPosition = this.sc.getGoldPosition();
+		Point hPosition = this.sc.getHunterPosition();
+		
+		int hDistance = Math.abs(gPosition.getY() - hPosition.getY());
+		int vDistance = Math.abs(gPosition.getX() - hPosition.getX());
+		
+		if(useFirstDiagonal){
+			return incrementPositionDiagonal(hDistance, vDistance, 
+					hPosition, gPosition);
+		} else {
+			return incrementPositionHorizontal(hDistance, vDistance, 
+					hPosition, gPosition);
+		}
+	}
+	
+	private List<Point> incrementPositionDiagonal(int hDistance, int vDistance, 
+			Point hunterPosition, Point goldPosition){
+		
+		List<Point> points = new LinkedList<Point>();
+		Point actualPoint = this.sc.getHunterPosition();
 		
 		if(hDistance > vDistance){
-			while(hDistance != vDistance){
-				
+			while(hDistance > vDistance){
+				actualPoint = selectPoint(actualPoint, goldPosition);
+				points.add(actualPoint);
+				hDistance = Math.abs(actualPoint.getY() - goldPosition.getY());
+				vDistance = Math.abs(actualPoint.getX() - goldPosition.getX());
 			}
 		} else {
-			while(hDistance != vDistance){
-				
+			while(hDistance <= vDistance){
+				actualPoint = selectPoint(actualPoint, goldPosition);
+				points.add(actualPoint);
+				hDistance = Math.abs(actualPoint.getY() - goldPosition.getY());
+				vDistance = Math.abs(actualPoint.getX() - goldPosition.getX());
 			}
 		}
+		
+		return points;
+	};
+	
+	private List<Point> incrementPositionHorizontal(int hDistance, int vDistance, 
+			Point hunterPosition, Point goldPosition){
+		return null;
+	};
+	
+	private Point selectPoint(Point actualPoint, Point goldPosition){
+		Point newPoint = new Point(actualPoint.getX(), actualPoint.getY());
+		if(actualPoint.getX() < goldPosition.getX()){
+			newPoint.setX(actualPoint.getX() + 1);
+		}
+		
+		if(actualPoint.getY() < goldPosition.getY()){
+			newPoint.setY(actualPoint.getY() + 1);
+		}
+		
+		return newPoint;
+	}
+	
+	public List<Point> getMovimentsToGold() {
+		return movimentsToGold;
 	}
 	
 	@Override
 	public String toString(){
-		String s = "";
-		for(List<Map<ComponentName, Component>> line : this.sc.getBoard()){
-			for(Map<ComponentName, Component> m : line){
-				if(m.size() == 0){
-					s += " * ";
-				} else {
-					for(ComponentName component : m.keySet()){
-						if(component == null){
-							s += " * ";
-						} else {
-							if(m.values().size() > 1){
-								s += component.getSymbol();
-							} else {
-								s += component.toString();								
-							}
-						}
-					}
-				}
-			}
-			s += "\n";
-		}
-		return s;
-	}
-	
-	public String generateMinorRouteToGold(){
-		return "";
+		return this.sc.toString();
 	}
 
 }

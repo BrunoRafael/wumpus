@@ -1,13 +1,10 @@
 package components;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import scenario.ComponentName;
 
 public class Hunter extends Component{
 	
-	public Hunter(List<Integer> coord){
+	public Hunter(Point coord){
 		super(coord, ComponentName.HUNTER);
 	}
 

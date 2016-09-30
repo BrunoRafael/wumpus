@@ -1,12 +1,10 @@
 package components;
 
-import java.util.List;
-
 import scenario.ComponentName;
 
 public class Gold extends Component{
 
-	public Gold(List<Integer> coord) {
+	public Gold(Point coord) {
 		super(coord, ComponentName.GOLD);
 	}
 

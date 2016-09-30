@@ -1,12 +1,10 @@
 package components;
 
-import java.util.List;
-
 import scenario.ComponentName;
 
 public class Alert extends Component{
 
-	public Alert(List<Integer> coord, ComponentName name) {
+	public Alert(Point coord, ComponentName name) {
 		super(coord, name);
 	}
 
