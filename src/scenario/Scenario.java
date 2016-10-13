@@ -1,11 +1,14 @@
 package scenario;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import components.Component;
 import components.Gold;
 import components.Hunter;
+import components.Movimentation;
 import components.Point;
 import main.State;
 
@@ -16,23 +19,28 @@ public class Scenario {
 	private Point hunterPosition;
 	private Point goldPosition;
 	
-	private History history;
+	private HistoryBase history;
 		
 	public Scenario(int width, int height){
-		this.setWidth(width);
-		this.setHeight(height);
-		history = new History();
-		List<List<Point>> matrix = new LinkedList<List<Point>>();
-		for(int i = 0; i < width; i++){
-			List<Point> line = new LinkedList<Point>();
-			for(int j = 0; j < height; j++){
-				Point item = new Point(i, j);
-				line.add(item);
+		try {
+			this.setWidth(width);
+			this.setHeight(height);
+			history = new HistoryBase();
+			List<List<Point>> matrix = new LinkedList<List<Point>>();
+			for(int i = 0; i < width; i++){
+				List<Point> line = new LinkedList<Point>();
+				for(int j = 0; j < height; j++){
+					Point item = new Point(i, j);
+					line.add(item);
+				}
+				matrix.add(line);
 			}
-			matrix.add(line);
+			
+			this.board = matrix;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		this.board = matrix;
 	}
 	
 	public Scenario(){
@@ -45,6 +53,7 @@ public class Scenario {
 				this.goldPosition = component.getCoordinates();
 			} else if(component instanceof Hunter) {
 				this.hunterPosition = component.getCoordinates();
+				this.saveAvailablePointsToNextPosition(this.hunterPosition);
 			}
 			
 			this.board.get(component.getX()).get(component.getY()).put(component.getName(), component);		
@@ -93,7 +102,7 @@ public class Scenario {
 				throw new Exception("Position unavailable");
 			}
 		}
-						
+		
 		Component c = this.board.get(
 				actualCoord.getX()).get(actualCoord.getY()).remove(componentName);
 		
@@ -102,7 +111,6 @@ public class Scenario {
 		nexPos.setExplored(true);
 		
 		if(componentName == ComponentName.HUNTER){
-			history.savePosition(hunterPosition);
 			this.hunterPosition = newCoord;
 		}
 		
@@ -132,33 +140,52 @@ public class Scenario {
 	public Point getHunterPosition(){
 		return this.hunterPosition;
 	}
-	
-	public List<Point> getAvailablePositionsToNext() {
-		return getAvailablePositionsToNext(this.hunterPosition);
-	}
-	
-	public List<Point> getAvailablePositionsToNext(Point p) {
+		
+	public List<Point> getAvailableNeighbors(Point p, boolean insertExplored) {
 		
 		List<Point> points = new LinkedList<Point>();
+		Point point;
 		if(p.getX() + 1 < width ){
-			points.add(board.get(p.getX() + 1).get(p.getY()));
+			point = board.get(p.getX() + 1).get(p.getY());
+			insertPoint(point, insertExplored, points);
+			
 		}
 		
 		if(p.getY() + 1 < height){
-			points.add(board.get(p.getX()).get(p.getY() + 1));
+			point = board.get(p.getX()).get(p.getY() + 1);
+			insertPoint(point, insertExplored, points);
 		}
 		
 		if(p.getX() - 1 >= 0){
-			points.add(board.get(p.getX() - 1).get(p.getY()));
+			point = board.get(p.getX() - 1).get(p.getY());
+			insertPoint(point, insertExplored, points);
 		}
 		
 		if(p.getY() - 1 >= 0){
-			points.add(board.get(p.getX()).get(p.getY() - 1));			
+			point = board.get(p.getX()).get(p.getY() - 1);
+			insertPoint(point, insertExplored, points);
 		}
 		
 		return points;
 	}
 	
+	private void insertPoint(Point p, boolean insertExplored, List<Point> points) {
+		if(insertExplored){
+			if(insertExplored){
+				if(p.isExplored() && !p.getThreats().isEmpty()){
+					points.add(p);
+				}
+			} else {
+				points.add(p);
+			}
+		} else {
+			if(!p.isExplored()){
+				points.add(p);
+			}
+		}
+		
+	}
+
 	@Override
 	public String toString(){
 		String s = "";
@@ -184,4 +211,19 @@ public class Scenario {
 		}
 		return s;
 	}
+
+	public void saveAvailablePointsToNextPosition(Point pos) {
+		this.history.removeExploredPointInNextPositions(pos);
+		List<Point> neighbors = getAvailableNeighbors(pos, false);
+		history.saveAvailablePointsToNextPosition(neighbors);
+	}
+
+	public List<Point> getAvailablePointsToNextPosition() {
+		return this.history.getAvailablePointsToNextPosition();
+	}
+	
+	public void saveMovimentation(Movimentation mov) throws FileNotFoundException, IOException{
+		history.saveMoviment(mov);
+	}
+
 }

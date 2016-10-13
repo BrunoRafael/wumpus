@@ -5,6 +5,7 @@ import scenario.ComponentName;
 public abstract class Component {
 	private Point coordinates;
 	private ComponentName name;
+	private double probabilityOfDanger;
 		
 	public Component(Point coord, ComponentName name){
 		this.coordinates = coord;
@@ -46,5 +47,5 @@ public abstract class Component {
 	public void setName(ComponentName name) {
 		this.name = name;
 	}
-	
+
 }

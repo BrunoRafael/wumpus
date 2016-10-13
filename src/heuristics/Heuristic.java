@@ -16,6 +16,6 @@ public abstract class Heuristic {
 		this.priority = priority;
 	}
 	
-	abstract public Point evaluatePositions(List<Point> points);
+	abstract public Point evaluatePositions(List<Point> points, Point actualPosition);
 	
 }

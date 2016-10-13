@@ -9,25 +9,30 @@ import components.Danger;
 import components.Gold;
 import components.Hole;
 import components.Hunter;
+import components.Movimentation;
 import components.Point;
 import components.Wumpus;
 import main.State;
+import utils.Direction;
 
 public class ScenarioManager {
 	
 	private Scenario sc;
 	private List<Point> movimentsToGold;
 	
-	public ScenarioManager(boolean useFirstDiagonal){
+	private static ScenarioManager sm;
+	
+	private ScenarioManager(){
 		this.sc = new Scenario();
 		generateScenario();
-		this.movimentsToGold = getMovimentsToGold(useFirstDiagonal);
+		this.movimentsToGold = generateMovimentsToGold();
 	}
-	
+		
 	private void generateScenario(){
 		try {
 			
 			this.sc.addComponent(new Hunter(new Point(0, 0)));
+
 			Danger wumpus = new Wumpus(generatePosition(ComponentName.WUMPUS));
 			sc.addComponent(wumpus);
 			addAlertTo(wumpus);
@@ -41,8 +46,8 @@ public class ScenarioManager {
 			
 			Component gold = new Gold(generatePosition(ComponentName.GOLD));
 			sc.addComponent(gold);
+			explore(this.sc.getHunterPosition());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -88,7 +93,6 @@ public class ScenarioManager {
 				this.sc.addComponent(cTarget.createAlert(pos));
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -97,16 +101,39 @@ public class ScenarioManager {
 	 * @throws Exception 
 	 * 
 	 */
-	public State explore(Point newCoord) throws Exception{
+	public State saveMoveAndExplore(Point newCoord, boolean containsThreat) throws Exception{
+		Point p = this.sc.getHunterPosition();
+		State st = explore(newCoord);
+		
+		Movimentation mov = new Movimentation();
+		mov.setLocalization(newCoord.getX() + "," + newCoord.getY());
+		mov.setPerception(containsThreat ? 1 : 0);
+		
+		Direction d = getDirection(p, newCoord);
+		mov.setMovimentation(d.getCode());
+		
+		if(st == State.GAME_OVER_HOLE || st == State.GAME_OVER_WUMPUS){
+			mov.setExit(0);
+		} else {
+			mov.setExit(1);
+		}
+		
+		this.sc.saveMovimentation(mov);
+		
+		return st;
+	}
+	
+	private State explore(Point newCoord) throws Exception {
+		this.sc.saveAvailablePointsToNextPosition(newCoord);
 		return this.sc.moveComponent(ComponentName.HUNTER, 
 				this.sc.getHunterPosition(), newCoord);
 	}
-	
-	public List<Point> getHunterAvailablePositions(){
-		return sc.getAvailablePositionsToNext();
+
+	public List<Point> getAllNeighbors(Point p, boolean insertExplored){
+		return this.sc.getAvailableNeighbors(p, insertExplored);
 	}
 	
-	private List<Point> getMovimentsToGold(boolean useFirstDiagonal){
+	private List<Point> generateMovimentsToGold(){
 		
 		Point gPosition = this.sc.getGoldPosition();
 		Point hPosition = this.sc.getHunterPosition();
@@ -114,13 +141,8 @@ public class ScenarioManager {
 		int hDistance = Math.abs(gPosition.getY() - hPosition.getY());
 		int vDistance = Math.abs(gPosition.getX() - hPosition.getX());
 		
-		if(useFirstDiagonal){
-			return incrementPositionDiagonal(hDistance, vDistance, 
-					hPosition, gPosition);
-		} else {
-			return incrementPositionHorizontal(hDistance, vDistance, 
-					hPosition, gPosition);
-		}
+		return incrementPositionDiagonal(hDistance, vDistance, 
+				hPosition, gPosition);
 	}
 	
 	private List<Point> incrementPositionDiagonal(int hDistance, int vDistance, 
@@ -155,11 +177,6 @@ public class ScenarioManager {
 		return points;
 	};
 	
-	private List<Point> incrementPositionHorizontal(int hDistance, int vDistance, 
-			Point hunterPosition, Point goldPosition){
-		return null;
-	};
-	
 	private Point selectPoint(Point actualPoint, Point goldPosition){
 		Point newPoint = new Point(actualPoint.getX(), actualPoint.getY());
 		if(actualPoint.getX() < goldPosition.getX() && 
@@ -178,10 +195,71 @@ public class ScenarioManager {
 	public List<Point> getMovimentsToGold() {
 		return movimentsToGold;
 	}
+
+	public List<Point> getAvailablePointsToNextPosition(double maximumDistance, boolean insertExplored) {
+		List<Point> points = new LinkedList<Point>();
+		for(Point p : this.sc.getAvailablePointsToNextPosition()){
+			double distance = calculateDistance(this.sc.getHunterPosition(), p);
+			if(insertExplored){
+				if(p.isExplored() && distance <= maximumDistance){
+					points.add(p);
+				}
+			} else {
+				if(!p.isExplored() && distance <= maximumDistance){
+					points.add(p);
+				}
+			}
+		}
+		return points;
+	}
 	
+	public Point getActualPosition(){
+		return this.sc.getHunterPosition();
+	}
+
 	@Override
 	public String toString(){
 		return this.sc.toString();
 	}
 
+	public double calculateDistance(Point actualPos, Point evaluatePos) {
+		double xDiff = Math.abs(actualPos.getX() - evaluatePos.getX());
+		double yDiff = Math.abs(actualPos.getY() - evaluatePos.getY());
+
+		return xDiff + yDiff;
+	}
+	
+	public Direction getDirection(Point origin, Point destination){
+		int diffX = destination.getX() - origin.getX();
+		int diffY = destination.getY() - origin.getY();
+		if(diffX == diffY){
+			return null;
+		}
+		if(diffX > diffY){
+			if(diffX > 0){
+				return Direction.RIGHT;
+			} else {
+				return Direction.LEFT;
+			}
+		} else {
+			if(diffY > 0){
+				return Direction.DOWN;
+			} else {
+				return Direction.UP;
+			}
+		}
+	}
+	
+	public static ScenarioManager newInstance(){
+		sm = new ScenarioManager();
+		return sm;
+	}
+
+	public static ScenarioManager getInstance() {
+		if(sm == null){
+			sm = new ScenarioManager();
+		}
+		return sm;
+	}
+	
 }

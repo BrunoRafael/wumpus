@@ -9,7 +9,7 @@ public class LinearHeuristic extends Heuristic {
 	private List<Point> pointsToGold;
 	
 	@Override
-	public Point evaluatePositions(List<Point> points) {
+	public Point evaluatePositions(List<Point> points, Point actualPos) {
 		Point selectedPosition = points.get(0);
 		double minDistance = calculateMinDistanceToLine(selectedPosition);
 		for(int i = 1; i < points.size(); i++){
@@ -37,17 +37,12 @@ public class LinearHeuristic extends Heuristic {
 			if(square < minDistance){
 				minDistance = square;
 			}
-			
 		}
-		return minDistance;
-	}
 
-	public List<Point> getPointsToGold() {
-		return pointsToGold;
+		return minDistance;
 	}
 
 	public void setPointsToGold(List<Point> pointsToGold) {
 		this.pointsToGold = pointsToGold;
 	}
-
 }

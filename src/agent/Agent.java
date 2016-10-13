@@ -13,43 +13,80 @@ public class Agent {
 	private Heuristic heuristic;
 	private ScenarioManager sManager;
 	
-	public Agent(Heuristic heuristic, boolean useFirstDiagonal){
+	private int victories, defeats;
+	
+	public static final int MAXIMUM_DISTANCE = 5;
+	
+	public Agent(Heuristic heuristic){
 		this.heuristic = heuristic;
-		this.sManager = new ScenarioManager(useFirstDiagonal);
-		if(this.heuristic instanceof LinearHeuristic){
-			((LinearHeuristic)this.heuristic).setPointsToGold(sManager.getMovimentsToGold());
-		}
+		restart();
 	}
 	
-	public boolean nextMove() {
+	public boolean moveNext() {
 		State actualState = State.CONTINUE;
 		System.out.println(sManager.toString());
 		while(actualState == State.CONTINUE){
-			List<Point> pts = sManager.getHunterAvailablePositions();
-			Point pt = heuristic.evaluatePositions(pts);
+			List<Point> pts = sManager.getAvailablePointsToNextPosition(MAXIMUM_DISTANCE, false);
+			if(pts.isEmpty()){
+				pts = sManager.getAvailablePointsToNextPosition(MAXIMUM_DISTANCE, true);
+			}
+			boolean containsThreat = containsThreat(pts);
+			Point pt = heuristic.evaluatePositions(pts, sManager.getActualPosition());
 			try {
-				actualState = sManager.explore(pt);
-				System.out.println(sManager.toString());
+				if(pt != null){
+					actualState = sManager.saveMoveAndExplore(pt, containsThreat);
+					System.out.println(sManager.toString());
+				} else {
+					System.out.print("Nenhum ponto avaliado!");
+					return true;
+				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				// TODO Handle errors
 				e.printStackTrace();
 			}
 		}
 		
 		if(actualState == State.GAME_OVER_HOLE){
+			defeats++;
 			System.out.println("Game over, hole found");
 		} else if(actualState == State.GAME_OVER_WUMPUS){
+			defeats++;
 			System.out.println("Game over, wumpus found!");
 		} else {
+			victories++;
 			System.out.println("Victoryyy :D");
 		}
 		
 		return true;
 	}
 	
+	private boolean containsThreat(List<Point> pts) {
+		for(Point p : pts){
+			List<Point> neighbors = this.sManager.getAllNeighbors(p, true);
+			if(!neighbors.isEmpty()){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public String toString(){
 		return sManager.toString();
 	}
-		
+
+	public int getDefeats() {
+		return defeats;
+	}
+	
+	public int getVictories(){
+		return victories;
+	}
+
+	public void restart() {
+		this.sManager = ScenarioManager.newInstance();
+		if(this.heuristic instanceof LinearHeuristic){
+			((LinearHeuristic)this.heuristic).setPointsToGold(sManager.getMovimentsToGold());
+		}
+	}
 }

@@ -1,7 +1,5 @@
 package components;
 
-import java.util.List;
-
 import scenario.ComponentName;
 
 public class Hole extends Danger{
@@ -21,5 +19,4 @@ public class Hole extends Danger{
 	public char getSymbol() {
 		return ComponentName.HOLE.getSymbol();
 	}
-
 }

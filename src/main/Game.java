@@ -6,16 +6,27 @@ import heuristics.Heuristic;
 public class Game {
 
 	private Agent agent;
-	
-	public Game(Heuristic heuristic, boolean useFirstDiagonal){
-		this.agent = new Agent(heuristic, useFirstDiagonal);
+		
+	public Game(Heuristic heuristic){
+		this.agent = new Agent(heuristic);
 	}
 	
-	public void execute(){
-		boolean finalized = agent.nextMove(); 
-		while(!finalized){
-			finalized = agent.nextMove();
+	public void execute(int repeat){
+		for(int i = 1; i <= 100; i++){
+			boolean finalized = agent.moveNext(); 
+			while(!finalized){
+				finalized = agent.moveNext();
+			}
+			agent.restart();
 		}
+	}
+	
+	public int getDefeats(){
+		return agent.getDefeats();
+	}
+	
+	public int getVictories(){
+		return agent.getVictories();
 	}
 	
 	@Override

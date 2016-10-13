@@ -8,5 +8,4 @@ public class Empty extends Component{
 	public char getSymbol() {
 		return ComponentName.EMPTY.getSymbol();
 	}
-
 }
