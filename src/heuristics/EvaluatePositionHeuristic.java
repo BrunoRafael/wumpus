@@ -89,7 +89,7 @@ public class EvaluatePositionHeuristic extends Heuristic{
 	}
 
 	private List<Double> evaluateNebulousConditions(Point evaluatePos, Point actualPos) {
-		List<Point> points = sm.getAllNeighbors(evaluatePos, true);
+		List<Point> points = sm.getAllNeighbors(evaluatePos, null, true);
 		List<Double> fitness = new ArrayList<Double>();
 		fitness.add(0.0);
 		fitness.add(0.0);

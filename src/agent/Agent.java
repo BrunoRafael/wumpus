@@ -7,6 +7,7 @@ import heuristics.Heuristic;
 import heuristics.LinearHeuristic;
 import main.State;
 import scenario.ScenarioManager;
+import scenario.Tree;
 
 public class Agent {
 
@@ -34,6 +35,7 @@ public class Agent {
 			Point pt = heuristic.evaluatePositions(pts, sManager.getActualPosition());
 			try {
 				if(pt != null){
+					//Tree tree = new Tree(this.sManager.getActualPosition(), pt, this.sManager);
 					actualState = sManager.saveMoveAndExplore(pt, containsThreat);
 					System.out.println(sManager.toString());
 				} else {
@@ -62,7 +64,7 @@ public class Agent {
 	
 	private boolean containsThreat(List<Point> pts) {
 		for(Point p : pts){
-			List<Point> neighbors = this.sManager.getAllNeighbors(p, true);
+			List<Point> neighbors = this.sManager.getAllNeighbors(p, null, true);
 			if(!neighbors.isEmpty()){
 				return true;
 			}

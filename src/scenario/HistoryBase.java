@@ -27,13 +27,15 @@ public class HistoryBase {
 	private Instances dataSet;
 	private double[] values;
 	
-	private File f;
+	public int fileCount = 0;
+	
+	private File file;
 	
 	public static String FILE_PATH = File.separator + "data" + 
-									File.separator + "snapshots.arff";
+									File.separator + "snapshots%d.arff";
 	
 	public HistoryBase() throws IOException{
-		f = new File(".");
+		file = new File(".");
 		availablePointsToNextPosition = new TreeSet<Point>();
 		attributes = new FastVector();
 		
@@ -49,7 +51,9 @@ public class HistoryBase {
 	    // create Instances object
 	    dataSet = new Instances("Moviments", attributes, 0);
 	    
-	    BufferedWriter writer = new BufferedWriter(new FileWriter(f.getCanonicalPath() + FILE_PATH));
+	    String path = String.format(file.getCanonicalPath() + FILE_PATH, fileCount);
+	    BufferedWriter writer = new BufferedWriter(
+	    		new FileWriter(path));
 		writer.write(dataSet.toString());
 		writer.flush();
 		writer.close();
@@ -57,8 +61,9 @@ public class HistoryBase {
 	
 	public void saveMoviment(Movimentation mov) throws FileNotFoundException, IOException{
 		
+		String path = String.format(file.getCanonicalPath() + FILE_PATH , fileCount);
 		Instances data = new Instances(new BufferedReader(
-				new FileReader(f.getCanonicalPath() + FILE_PATH )));
+				new FileReader(path)));
 		
 		values = new double[dataSet.numAttributes()];
 		values[0] = data.attribute(0).addStringValue(mov.getLocalization());
@@ -84,8 +89,8 @@ public class HistoryBase {
 	}
 	
 	private void writeFile(Instances data) throws IOException{
-		BufferedWriter writer = new BufferedWriter(new FileWriter(
-	    		f.getCanonicalPath() + FILE_PATH ));
+		String path = String.format(file.getCanonicalPath() + FILE_PATH , fileCount);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(path));
 	    writer.write(data.toString());
 	    writer.flush();
 	    writer.close();

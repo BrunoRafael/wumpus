@@ -2,6 +2,7 @@ package scenario;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -140,30 +141,42 @@ public class Scenario {
 	public Point getHunterPosition(){
 		return this.hunterPosition;
 	}
+	
+	public List<Point> getAvailableNeighbors(Point point, List<Point> neighborsActual, boolean insertExplored) {
+		List<Point> points = getAvailableNeighbors(point);
+		List<Point> newPointList = new ArrayList<Point>();
+		for(Point p : points){
+			insertPoint(p, insertExplored, newPointList);
+		}
+		if(neighborsActual != null){
+			newPointList.removeAll(neighborsActual);
+		}
+		return newPointList;
+	}
 		
-	public List<Point> getAvailableNeighbors(Point p, boolean insertExplored) {
+	public List<Point> getAvailableNeighbors(Point p) {
 		
 		List<Point> points = new LinkedList<Point>();
 		Point point;
 		if(p.getX() + 1 < width ){
 			point = board.get(p.getX() + 1).get(p.getY());
-			insertPoint(point, insertExplored, points);
+			points.add(point);
 			
 		}
 		
 		if(p.getY() + 1 < height){
 			point = board.get(p.getX()).get(p.getY() + 1);
-			insertPoint(point, insertExplored, points);
+			points.add(point);
 		}
 		
 		if(p.getX() - 1 >= 0){
 			point = board.get(p.getX() - 1).get(p.getY());
-			insertPoint(point, insertExplored, points);
+			points.add(point);
 		}
 		
 		if(p.getY() - 1 >= 0){
 			point = board.get(p.getX()).get(p.getY() - 1);
-			insertPoint(point, insertExplored, points);
+			points.add(point);
 		}
 		
 		return points;
@@ -214,7 +227,7 @@ public class Scenario {
 
 	public void saveAvailablePointsToNextPosition(Point pos) {
 		this.history.removeExploredPointInNextPositions(pos);
-		List<Point> neighbors = getAvailableNeighbors(pos, false);
+		List<Point> neighbors = getAvailableNeighbors(pos, null, false);
 		history.saveAvailablePointsToNextPosition(neighbors);
 	}
 

@@ -98,7 +98,9 @@ public class Point implements Comparable<Point>{
 		}
 		
 		Point p = (Point) obj;
-		return p.hashCode() == this.hashCode();
+		return p.hashCode() == this.hashCode() && 
+				this.getX() == p.getX() &&
+				this.getY() == p.getY();
 	}
 	
 	@Override

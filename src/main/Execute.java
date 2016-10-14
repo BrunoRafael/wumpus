@@ -1,15 +1,46 @@
 package main;
 
 import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 
-import weka.core.Attribute;
-import weka.core.FastVector;
-import weka.core.Instance;
-import weka.core.Instances;
+import components.Point;
 
 public class Execute {
 	public static void main(String[] args) throws ParseException {
-		FastVector      atts;
+		List<Point> points = new LinkedList<Point>();
+		Point p1 = new Point(2, 5);
+		Point p2 = new Point(2, 4);
+		Point p3 = new Point(1, 5);
+		Point p4 = new Point(2, 6);
+		
+		points.add(p1);
+		points.add(p2);
+		points.add(p3);
+		points.add(p4);
+		for(Point p : points){
+			System.out.print(p.getX() + "," + p.getY());
+			System.out.println();
+		}
+		System.out.println("----------------------------------------");
+		List<Point> removePoints = new LinkedList<Point>();
+		removePoints.add(p1);
+		removePoints.add(p2);
+		Point p5 = new Point(8, 4);
+		Point p6 = new Point(10, 5);
+		Point p7 = new Point(12, 6);
+		removePoints.add(p5);
+		removePoints.add(p6);
+		removePoints.add(p7);
+		
+		System.out.println(points.containsAll(removePoints));
+		points.removeAll(removePoints);
+		
+		for(Point p : points){
+			System.out.print(p.getX() + "," + p.getY());
+			System.out.println();
+		}
+		/*FastVector      atts;
 	    FastVector      attsRel;
 	    FastVector      attVals;
 	    FastVector      attValsRel;
@@ -101,6 +132,6 @@ public class Execute {
 	    data.add(new Instance(1.0, vals));
 
 	    // 4. output data
-	    System.out.println(data);
+	    System.out.println(data);*/
 	}
 }

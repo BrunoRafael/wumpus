@@ -129,8 +129,12 @@ public class ScenarioManager {
 				this.sc.getHunterPosition(), newCoord);
 	}
 
-	public List<Point> getAllNeighbors(Point p, boolean insertExplored){
-		return this.sc.getAvailableNeighbors(p, insertExplored);
+	public List<Point> getAllNeighbors(Point p, List<Point> neighborsActual, boolean insertExplored){
+		return this.sc.getAvailableNeighbors(p, neighborsActual, insertExplored);
+	}
+	
+	public List<Point> getAllNeighbors(Point p){
+		return this.sc.getAvailableNeighbors(p);
 	}
 	
 	private List<Point> generateMovimentsToGold(){
