@@ -12,7 +12,7 @@ public class Game {
 	}
 	
 	public void execute(int repeat){
-		for(int i = 1; i <= 100; i++){
+		for(int i = 1; i <= repeat; i++){
 			boolean finalized = agent.moveNext(); 
 			while(!finalized){
 				finalized = agent.moveNext();

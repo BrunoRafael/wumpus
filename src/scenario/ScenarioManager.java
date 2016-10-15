@@ -110,16 +110,18 @@ public class ScenarioManager {
 		mov.setPerception(containsThreat ? 1 : 0);
 		
 		Direction d = getDirection(p, newCoord);
-		mov.setMovimentation(d.getCode());
+		if(d != null){
+			mov.setMovimentation(d.getCode());
 		
-		if(st == State.GAME_OVER_HOLE || st == State.GAME_OVER_WUMPUS){
-			mov.setExit(0);
-		} else {
-			mov.setExit(1);
+			if(st == State.GAME_OVER_HOLE || st == State.GAME_OVER_WUMPUS){
+				mov.setExit(0);
+			} else {
+				mov.setExit(1);
+			}
+			
+			
+			this.sc.saveMovimentation(mov);
 		}
-		
-		this.sc.saveMovimentation(mov);
-		
 		return st;
 	}
 	
